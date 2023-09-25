@@ -4,21 +4,28 @@
 from qbittorrentapi import Client
 
 # First Party
-from encoder.dataclass import Torrent, TorrentCategory, TorrentFile, TorrentTag
+from encoder.dataclass import (
+    SettingsqBittorrent,
+    Torrent,
+    TorrentCategory,
+    TorrentFile,
+    TorrentTag,
+)
 from encoder.exceptions import qBittorrentNotLogged, qBittorrentTorrentNotFound
 
 
 class qBittorrent:
     """qBittorrent API wrapper."""
 
-    def __init__(self, url: str) -> None:
+    def __init__(self, settings_qbittorrent: SettingsqBittorrent) -> None:
         """
         Initialize qBittorrent API wrapper.
 
         Args:
-            url (str): The URL of the qBittorrent client.
+            settings_qbittorrent (SettingsqBittorrent): The qBittorrent
+                settings.
         """
-        self._client = Client(host=url)
+        self._client = Client(host=settings_qbittorrent.url)
 
     def _check_logged_in(self) -> None:
         """
@@ -48,7 +55,10 @@ class qBittorrent:
         for torrent in torrents:
             category = TorrentCategory(torrent.category)
             tags = [TorrentTag(name=tag) for tag in torrent.tags]
-            files = [TorrentFile(name=file.name) for file in torrent.files]
+            files = [
+                TorrentFile(name=file.name, size=file.size)
+                for file in torrent.files
+            ]
 
             return Torrent(
                 name=torrent.name,
@@ -56,6 +66,7 @@ class qBittorrent:
                 category=category,
                 tags=tags,
                 files=files,
+                path=torrent.save_path,
                 progression=int(torrent.progress * 100),
             )
 

@@ -7,11 +7,21 @@ from enum import Enum
 from pydantic import BaseModel
 
 
+class SettingsqBittorrent(BaseModel):
+    """Encoder settings for qBittorrent."""
+
+    url: str
+    host: str
+    port: int
+    username: str
+    password: str
+
+
 class Settings(BaseModel):
     """Encoder settings."""
 
-    fast_qbittorrent_url: str
-    slow_qbittorrent_url: str
+    fast_qbittorrent: SettingsqBittorrent
+    slow_qbittorrent: SettingsqBittorrent
 
 
 class TorrentCategory(str, Enum):
@@ -31,6 +41,7 @@ class TorrentFile(BaseModel):
     """A torrent file."""
 
     name: str
+    size: int
 
 
 class Torrent(BaseModel):
@@ -42,3 +53,4 @@ class Torrent(BaseModel):
     tags: list[TorrentTag] = []
     files: list[TorrentFile] = []
     progression: int
+    path: str
